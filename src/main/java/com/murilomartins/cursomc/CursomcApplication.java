@@ -1,5 +1,6 @@
 package com.murilomartins.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.murilomartins.cursomc.domain.Cidade;
 import com.murilomartins.cursomc.domain.Cliente;
 import com.murilomartins.cursomc.domain.Endereco;
 import com.murilomartins.cursomc.domain.Estado;
+import com.murilomartins.cursomc.domain.Pagamento;
+import com.murilomartins.cursomc.domain.PagamentoComBoleto;
+import com.murilomartins.cursomc.domain.PagamentoComCartao;
+import com.murilomartins.cursomc.domain.Pedido;
 import com.murilomartins.cursomc.domain.Produto;
+import com.murilomartins.cursomc.domain.enums.EstadoPagamento;
 import com.murilomartins.cursomc.domain.enums.TipoCliente;
 import com.murilomartins.cursomc.repositories.CategoriaRepository;
 import com.murilomartins.cursomc.repositories.CidadeRepository;
 import com.murilomartins.cursomc.repositories.ClienteRepository;
 import com.murilomartins.cursomc.repositories.EnderecoRepository;
 import com.murilomartins.cursomc.repositories.EstadoRepository;
+import com.murilomartins.cursomc.repositories.PagamentoRepository;
+import com.murilomartins.cursomc.repositories.PedidoRepository;
 import com.murilomartins.cursomc.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -36,6 +44,10 @@ public class CursomcApplication implements CommandLineRunner{
 	private ClienteRepository clienteRepository;
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -44,7 +56,7 @@ public class CursomcApplication implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 		
-		//Instânciando CATEGORIA e PRODUTO no banco
+		//Instânciando CATEGORIA e PRODUTO no db
 		Categoria cat1 = new Categoria(null, "Informática");
 		Categoria cat2 = new Categoria(null, "Escritório");
 		
@@ -62,7 +74,7 @@ public class CursomcApplication implements CommandLineRunner{
 		categoriaRepository.saveAll(Arrays.asList(cat1, cat2));
 		produtoRepository.saveAll(Arrays.asList(p1, p2, p3));
 		
-		//Instânciando ESTADO e CIDADE no banco
+		//Instânciando ESTADO e CIDADE no db
 		Estado est1 = new Estado(null, "Minas Gerais");
 		Estado est2 = new Estado(null, "São Paulo");
 		
@@ -76,7 +88,7 @@ public class CursomcApplication implements CommandLineRunner{
 		estadoRepository.saveAll(Arrays.asList(est1, est2));
 		cidadeRepository.saveAll(Arrays.asList(c1, c2, c3));
 		
-		//Instânciando CLIENTE e ENDERECO no banco
+		//Instânciando CLIENTE e ENDERECO no db
 		Cliente cli1 = new Cliente(null, "Maria Silva", "maria@gmail.com", "08644909625", TipoCliente.PESSOAFISICA);
 		cli1.getTelefones().addAll(Arrays.asList("32325588", "955446633"));
 		
@@ -87,6 +99,23 @@ public class CursomcApplication implements CommandLineRunner{
 		
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		//Instânciando PEDIDOS e PAGAMENTOS no db
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		
 	}
 	
