@@ -1,4 +1,4 @@
- package com.murilomartins.cursomc.config;
+package com.murilomartins.cursomc.config;
 
 import java.text.ParseException;
 
@@ -30,5 +30,4 @@ public class DevConfig {
 		dbService.instantiateTestDatabase();
 		return true;
 	}
-	
 }
